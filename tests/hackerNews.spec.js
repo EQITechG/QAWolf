@@ -15,7 +15,7 @@ test.describe("Hacker News Article Sorting", () => {
 
       if (timeStamps.length >= 100) break;
       await page.locator(".morelink").click();
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(3000);
     }
 
     const firstHundredTimeStamps = timeStamps.slice(0, 100);
