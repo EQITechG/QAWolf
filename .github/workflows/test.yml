@@ -1,57 +1,57 @@
 name: Automated Tests
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'  # Runs every 6 hours
+  # schedule:
+  # - cron: '0 */6 * * *'  # Runs every 6 hours
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:  # Allows manual trigger
+    branches: [main]
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Cache Node.js modules
-      uses: actions/cache@v3
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-    - uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Install Playwright browsers
-      run: npx playwright install --with-deps
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
-    - name: Run automated tests
-      run: npm run test
+      - name: Run automated tests
+        run: npm run test
 
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright-report
-        path: playwright-report/
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
 
-    - name: Notify on failure
-      if: failure()
-      uses: actions/github-script@v6
-      with:
-        script: |
-          github.rest.issues.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            title: 'Automated Test Failure',
-            body: `Automated tests failed in workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
-          })
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Automated Test Failure',
+              body: `Automated tests failed in workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+            })
