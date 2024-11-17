@@ -22,7 +22,7 @@ test.describe("Hacker News Automation Suite", () => {
       if (timeStamps.length >= 100) break;
 
       await page.locator(".morelink").click();
-      await page.waitForTimeout(3000);
+      await page.waitForTimeout(5000);
     }
 
     const firstHundredTimeStamps = timeStamps.slice(0, 100);
