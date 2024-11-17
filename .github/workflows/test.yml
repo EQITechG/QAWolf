@@ -1,4 +1,5 @@
 name: Automated Tests
+
 on:
   schedule:
     - cron: '0 */6 * * *'  # Runs every 6 hours
@@ -11,33 +12,42 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - uses: actions/checkout@v3
+
+    - name: Cache Node.js modules
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - uses: actions/setup-node@v3
       with:
         node-version: '18'
-    
+
     - name: Install dependencies
       run: npm ci
-    
+
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
-    
+
     - name: Run automated tests
-      run: npm test
-    
+      run: npm run test
+
     - name: Generate test report
       if: always()
-      run: |
-        npm run playwright show-report
-        
+      run: npm run report
+
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: playwright-report
         path: playwright-report/
-        
+
     - name: Notify on failure
       if: failure()
       uses: actions/github-script@v6
@@ -47,5 +57,5 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: 'Automated Test Failure',
-            body: 'Automated tests failed in workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+            body: `Automated tests failed in workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
           })

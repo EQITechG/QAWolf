@@ -10,7 +10,8 @@
     "test:visual": "playwright test visual.spec.js --update-snapshots",
     "test:automation": "playwright test automation.spec.js",
     "test:ci": "playwright test --reporter=html,line",
-    "report": "playwright show-report"
+    "report": "playwright show-report playwright-report",
+    "install:browsers": "playwright install --with-deps"
   },
   "keywords": [],
   "author": "",
